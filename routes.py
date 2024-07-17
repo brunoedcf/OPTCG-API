@@ -1,7 +1,7 @@
 from typing import List
 from fastapi import APIRouter, Body, Request, HTTPException, status
 from fastapi.encoders import jsonable_encoder
-from models import Collection, Card
+from models import Collection, Card, CardWithCollection
 
 router = APIRouter()
 
@@ -92,11 +92,10 @@ def get_cards_by_collection(request: Request, collection_id: str):
     return cards
 
 
-# GET route for retrieving a card by collection number
 @router.get(
     "/cards/{collection_number}",
     response_description="Get a card by collection number",
-    response_model=Card,
+    response_model=CardWithCollection,
 )
 def get_card_by_collection_number(request: Request, collection_number: str):
     card = request.app.database["cards"].find_one(
@@ -106,7 +105,16 @@ def get_card_by_collection_number(request: Request, collection_number: str):
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail="Card not found"
         )
-    return card
+
+    collection = request.app.database["collections"].find_one(
+        {"_id": card["collection_id"]}
+    )
+    if collection is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Collection not found"
+        )
+
+    return {"card": card, "collection": collection}
 
 
 # PUT route for updating a collection by acronym

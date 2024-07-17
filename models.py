@@ -1,6 +1,13 @@
 import uuid
 from pydantic import BaseModel, Field
 from datetime import datetime
+import pytz
+
+br_timezone = pytz.timezone("America/Sao_Paulo")
+
+
+def get_brazil_time():
+    return datetime.now(br_timezone)
 
 
 # Pydantic model for Collection
@@ -35,6 +42,7 @@ class Card(BaseModel):
     highest_price: float
     link_marketplace: str = Field(...)
     image: str = Field(...)
+    last_updated: datetime = Field(default_factory=get_brazil_time)
 
     class Config:
         populate_by_name = True
@@ -49,5 +57,12 @@ class Card(BaseModel):
                 "highest_price": 3.99,
                 "link_marketplace": "https://www.ligaonepiece.com.br/?view=cards/card&card=Ain%20(OP07-002)&ed=OP-07&num=OP07-002",
                 "image": "//repositorio.sbrauble.com//arquivos/in/onepiece/34/667066301241f-bny1l-dl3ag-abe41489b7529f93619f73610b65569a.jpg",
+                "last_updated": "2024-07-11T12:34:56.789-03:00",
             }
         }
+
+
+# New Pydantic model for the combined response
+class CardWithCollection(BaseModel):
+    card: Card
+    collection: Collection
