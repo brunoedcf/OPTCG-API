@@ -1,6 +1,6 @@
 # OPTCG-PyMongo-FastAPI
 
-This project is ...
+FastAPI application managing a MongoDB database with endpoints for creating, updating, and retrieving card and collection data. Uses Pydantic models for data validation and serialization.
 
 ## Prerequisites
 
